@@ -1,4 +1,4 @@
-## Grupo: Akaz Luis, Maria Clara Correa Adorno, Mateus Azevedo e Raquel de Almeida
+## Grupo: Akaz Guerra, Maria Clara Correa Adorno, Mateus Azevedo e Raquel de Almeida Silva
 
 
 ## Instalação
