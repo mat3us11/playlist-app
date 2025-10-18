@@ -7,3 +7,8 @@
    npm install
    npx expo install expo-linear-gradient
    npx expo start
+
+## 📸 Preview
+
+![Tela de lista](./assets/musicas.jpg)
+![Tela de cadastro](./assets/cadastro-musicas.jpg)
