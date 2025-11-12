@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { saveSong } from '../src/storage/songsStorage';
+import { api } from '../apiConfig';
 import { Colors, Radius, Shadow, Spacing } from '../src/theme';
 
 const DURATION_REGEX = /^(\d{1,2}):(\d{2})$/; // mm:ss
@@ -13,6 +13,7 @@ export default function NewSong() {
   const [duration, setDuration] = useState('');
   const [artist, setArtist] = useState('');
   const [genre, setGenre] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSave = async () => {
     if (!title.trim() || !artist.trim()) {
@@ -23,33 +24,49 @@ export default function NewSong() {
       Alert.alert('Duração inválida', 'Use o formato mm:ss (ex.: 03:45).');
       return;
     }
-    await saveSong({
-      id: Date.now().toString(),
-      title: title.trim(),
-      duration: duration.trim(),
-      artist: artist.trim(),
-      genre: genre.trim(),
-      createdAt: new Date().toISOString(),
-    });
-    router.back();
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        duration: duration.trim(),
+        artist: artist.trim(),
+        genre: genre.trim(),
+        createdAt: new Date().toISOString(),
+      };
+
+      console.log('[POST] /songs', payload);
+      const res = await api.post('/songs', payload);
+      console.log('status:', res.status, 'data:', res.data);
+
+      Alert.alert('Sucesso', 'Música cadastrada!');
+      router.replace('/');
+    } catch (error: any) {
+      console.log('ERRO POST /songs:', error?.message, error?.response?.status, error?.response?.data);
+      Alert.alert('Erro', error?.message || 'Falha ao cadastrar a música');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={['#4B3C3C', '#2F2727']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+      <LinearGradient
+        colors={['#4B3C3C', '#2F2727']}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
         <Text style={styles.headerTitle}>Cadastre uma nova música</Text>
       </LinearGradient>
 
-      {/* Card do formulário */}
       <View style={styles.formCard}>
-        <Field label="nome da música" value={title} onChangeText={setTitle} />
-        <Field label="duração da música (mm:ss)" value={duration} onChangeText={setDuration} keyboardType="numbers-and-punctuation" />
-        <Field label="compositor" value={artist} onChangeText={setArtist} />
-        <Field label="estilo" value={genre} onChangeText={setGenre} />
+        <Field label="Nome da música" value={title} onChangeText={setTitle} placeholder="Ex.: Lost Stars" />
+        <Field label="Duração (mm:ss)" value={duration} onChangeText={setDuration} placeholder="03:45" keyboardType="numbers-and-punctuation" />
+        <Field label="Compositor" value={artist} onChangeText={setArtist} placeholder="Ex.: Adam Levine" />
+        <Field label="Estilo" value={genre} onChangeText={setGenre} placeholder="Ex.: Pop" />
 
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleSave}>
-          <Text style={styles.primaryBtnText}>SALVAR</Text>
+        <TouchableOpacity style={[styles.primaryBtn, submitting && { opacity: 0.7 }]} onPress={handleSave} disabled={submitting}>
+          <Text style={styles.primaryBtnText}>{submitting ? 'SALVANDO...' : 'SALVAR'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -82,7 +99,6 @@ const styles = StyleSheet.create({
     ...Shadow.card,
   },
   headerTitle: { color: Colors.text, textAlign: 'center', fontSize: 18, fontWeight: '800', letterSpacing: 0.4 },
-
   formCard: {
     marginTop: -12,
     marginHorizontal: Spacing.lg,
@@ -99,7 +115,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     paddingVertical: 8,
   },
-
   primaryBtn: {
     marginTop: Spacing.md,
     backgroundColor: Colors.accent,

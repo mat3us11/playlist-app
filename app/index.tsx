@@ -2,14 +2,48 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect } from 'expo-router';
 import React from 'react';
-import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { loadSongs } from '../src/storage/songsStorage';
+import { Alert, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { api } from '../apiConfig';
 import { Colors, Radius, Shadow, Spacing } from '../src/theme';
 import type { Song } from '../src/types';
 
 export default function Index() {
   const [songs, setSongs] = React.useState<Song[]>([]);
-  const refresh = React.useCallback(async () => setSongs(await loadSongs()), []);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const refresh = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('🔄 Carregando músicas da API...');
+      const res = await api.get('/songs');
+
+      console.log('🛰️ Resposta:', res.data);
+
+      if (Array.isArray(res.data)) {
+        setSongs(res.data);
+      } else if (res.data && typeof res.data === 'object') {
+        const lista = res.data.songs || Object.values(res.data)[0];
+        if (Array.isArray(lista)) {
+          setSongs(lista);
+        } else {
+          throw new Error('Formato inesperado da resposta da API.');
+        }
+      } else {
+        throw new Error('Resposta inválida da API.');
+      }
+    } catch (e: any) {
+      console.log('❌ Erro ao carregar músicas:', e?.message || e);
+      Alert.alert('Erro', e?.message || 'Falha ao carregar músicas');
+      setError(e?.message || 'Falha ao carregar músicas');
+      setSongs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Atualiza a lista ao entrar na tela
   useFocusEffect(React.useCallback(() => { refresh(); }, [refresh]));
 
   const renderItem = ({ item, index }: { item: Song; index: number }) => (
@@ -46,7 +80,6 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* Header gradient */}
       <LinearGradient
         colors={['#4B3C3C', '#2F2727']}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
@@ -64,15 +97,21 @@ export default function Index() {
         </Link>
       </LinearGradient>
 
+      {error ? <Text style={styles.empty}>Erro: {error}</Text> : null}
+      {loading && !songs.length ? <Text style={styles.empty}>Carregando...</Text> : null}
+
       <FlatList
         data={songs}
-        keyExtractor={(it) => it.id}
+        keyExtractor={(it) => String(it.id ?? `${it.title}-${it.artist}`)}
         renderItem={renderItem}
         contentContainerStyle={{ paddingTop: Spacing.lg, paddingBottom: 100 }}
-        ListEmptyComponent={<Text style={styles.empty}>Nenhuma música cadastrada ainda.</Text>}
+        ListEmptyComponent={
+          !loading && !error ? (
+            <Text style={styles.empty}>Nenhuma música cadastrada ainda.</Text>
+          ) : null
+        }
       />
 
-      {/* FAB flutuante */}
       <Link href="/new" asChild>
         <Pressable style={styles.fab} android_ripple={{ color: 'rgba(255,255,255,0.15)', borderless: true }}>
           <Ionicons name="add" size={28} color="#0E1220" />
@@ -97,7 +136,6 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: Radius.full, borderWidth: 1, borderColor: Colors.stroke,
     alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)',
   },
-
   cardWrap: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.md },
   card: {
     flexDirection: 'row',
@@ -110,11 +148,9 @@ const styles = StyleSheet.create({
   },
   leftCol: { width: 36, alignItems: 'center' },
   index: { color: Colors.textMuted, fontWeight: '700' },
-
   centerCol: { flex: 1, paddingHorizontal: Spacing.sm },
   title: { color: Colors.text, fontWeight: '800', fontSize: 16 },
   artist: { color: Colors.textMuted, marginTop: 2 },
-
   chipsRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
   chip: {
     flexDirection: 'row',
@@ -127,16 +163,13 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.stroke,
   },
   chipText: { color: Colors.chipText, fontSize: 12, fontWeight: '600' },
-
   playBtn: {
     width: 40, height: 40, borderRadius: Radius.full,
     backgroundColor: Colors.accent,
     alignItems: 'center', justifyContent: 'center',
     marginLeft: Spacing.md,
   },
-
   empty: { color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.xl },
-
   fab: {
     position: 'absolute', right: 20, bottom: 24,
     width: 56, height: 56, borderRadius: Radius.full,
