@@ -4,14 +4,12 @@
 
 Aplicativo React Native desenvolvido em **Expo**, que permite cadastrar músicas, listar e consumir dados de uma API local (JSON Server) exposta na internet através do **ngrok**.
 
-
 ## 🚀 Funcionalidades
 
 - 📄 Listar músicas vindas da API (`/songs`)
 - ➕ Cadastrar novas músicas (título, artista, duração e gênero)
 - 🔄 Atualização automática da lista ao cadastrar
 - 🌐 Integração com **JSON Server** + **ngrok** para rodar em celular real via rede
-
 
 ## ⚙️ Tecnologias Usadas
 
@@ -24,26 +22,39 @@ Aplicativo React Native desenvolvido em **Expo**, que permite cadastrar músicas
 ---
 
 ## Instalação
-1. Rode no teminal
+
+1. Rode no terminal:
+   ```bash
    npm install
    npx expo install expo-linear-gradient
+   ```
 
-# Crie um arquivo db.json em uma pasta separada, por exemplo:
-C:\api-fake-json\db.json
+2. Crie um arquivo `db.json` em uma pasta separada, por exemplo:
+   ```
+   C:\api-fake-json\db.json
+   ```
 
-# Com o conteudo:
-{
-  "songs": [
-    { "id": 1, "title": "Primeira Música", "artist": "Autor", "duration": "03:45", "genre": "Pop" }
-  ]
-}
+3. Com o conteúdo:
+   ```json
+   {
+     "songs": [
+       { "id": 1, "title": "Primeira Música", "artist": "Autor", "duration": "03:45", "genre": "Pop" }
+     ]
+   }
+   ```
 
-# Depois rode o servidor 
-cd C:\api-fake-json
-npx json-server --watch db.json --port 8000
+4. Depois rode o servidor:
+   ```bash
+   cd C:\api-fake-json
+   npx json-server --watch db.json --port 8000
+   ```
 
-# Rodar o app:
-npx expo start
+5. Rodar o app:
+   ```bash
+   npx expo start
+   ```
+
+---
 
 ## 📸 Preview
 
