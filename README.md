@@ -1,15 +1,15 @@
 ## Grupo: Akaz Guerra, Maria Clara Correa Adorno, Mateus Azevedo e Raquel de Almeida Silva
 
-# 🎵 Projeto Playlist App (Cadastro de Músicas)
+#  Projeto Playlist App (Cadastro de Músicas)
 
 Aplicativo React Native desenvolvido em **Expo**, que permite cadastrar músicas, listar e consumir dados de uma API local (JSON Server) exposta na internet através do **ngrok**.
 
-## 🚀 Funcionalidades
+# Funcionalidades
 
-- 📄 Listar músicas vindas da API (`/songs`)
-- ➕ Cadastrar novas músicas (título, artista, duração e gênero)
-- 🔄 Atualização automática da lista ao cadastrar
-- 🌐 Integração com **JSON Server** + **ngrok** para rodar em celular real via rede
+-  Listar músicas vindas da API (`/songs`)
+-  Cadastrar novas músicas (título, artista, duração e gênero)
+-  Atualização automática da lista ao cadastrar
+-  Integração com **JSON Server** + **ngrok** para rodar em celular real via rede
 
 ## ⚙️ Tecnologias Usadas
 
@@ -56,7 +56,7 @@ Aplicativo React Native desenvolvido em **Expo**, que permite cadastrar músicas
 
 ---
 
-## 📸 Preview
+# Preview
 
 ![Tela de lista](./assets/musicas.jpg)
 ![Tela de cadastro](./assets/cadastro-musicas.jpg)
